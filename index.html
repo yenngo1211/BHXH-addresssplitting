@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tách Địa Chỉ Việt Nam</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3348;
+    --accent: #4f8ef7;
+    --accent2: #38d9a9;
+    --text: #e8ecf4;
+    --text-muted: #6b7394;
+    --danger: #ff6b6b;
+    --warn: #ffa94d;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 32px 20px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+
+  header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+
+  header p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .container { max-width: 1400px; margin: 0 auto; }
+
+  .input-area {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .input-area label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+
+  textarea {
+    width: 100%;
+    height: 180px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  textarea:focus { border-color: var(--accent); }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  button {
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #6c8ef9);
+    color: #fff;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(79,142,247,0.4); }
+
+  .btn-secondary {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-export {
+    background: linear-gradient(135deg, #1a7a4a, var(--accent2));
+    color: #fff;
+    margin-left: auto;
+  }
+  .btn-export:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(56,217,169,0.35); }
+
+  .btn-copy {
+    background: linear-gradient(135deg, #5c3d8f, #9b59d0);
+    color: #fff;
+  }
+  .btn-copy:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(155,89,208,0.4); }
+  .btn-copy.copied {
+    background: linear-gradient(135deg, #1a7a4a, var(--accent2));
+  }
+
+  .copy-toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #1e2235;
+    border: 1px solid var(--accent2);
+    color: var(--accent2);
+    padding: 10px 22px;
+    border-radius: 30px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    opacity: 0;
+    transition: all 0.25s ease;
+    pointer-events: none;
+    z-index: 9999;
+    white-space: nowrap;
+  }
+  .copy-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 20px;
+    flex: 1;
+    min-width: 140px;
+    text-align: center;
+  }
+
+  .stat-card .num {
+    font-size: 1.6rem;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .stat-card .lbl {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .stat-card.ok .num { color: var(--accent2); }
+  .stat-card.warn .num { color: var(--warn); }
+  .stat-card.total .num { color: var(--accent); }
+
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .table-header span {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .filter-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .filter-row select, .filter-row input[type=text] {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 6px 12px;
+    color: var(--text);
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 0.83rem;
+    outline: none;
+  }
+
+  .filter-row select:focus, .filter-row input:focus { border-color: var(--accent); }
+
+  .scroll-wrap { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.84rem;
+  }
+
+  thead tr {
+    background: var(--surface2);
+  }
+
+  th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  th:hover { color: var(--accent); }
+
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  tr:hover td { background: rgba(79,142,247,0.04); }
+
+  .col-no { color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; width: 48px; }
+  .col-orig { color: var(--text-muted); max-width: 240px; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; }
+  .col-tinh { color: var(--accent); font-weight: 600; white-space: nowrap; }
+  .col-xa { color: var(--accent2); font-weight: 500; }
+  .col-rest { color: var(--text); }
+  .col-status { white-space: nowrap; }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+  .tag-ok { background: rgba(56,217,169,0.15); color: var(--accent2); }
+  .tag-partial { background: rgba(255,169,77,0.15); color: var(--warn); }
+  .tag-fail { background: rgba(255,107,107,0.15); color: var(--danger); }
+
+  .empty-state {
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--text-muted);
+  }
+
+  .empty-state .icon { font-size: 2.5rem; margin-bottom: 12px; }
+
+  .hint {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 10px;
+    line-height: 1.6;
+  }
+
+  .hint b { color: var(--warn); }
+
+  .ma-badge {
+    display: inline-block;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-left: 6px;
+  }
+
+  @media(max-width: 700px) {
+    header h1 { font-size: 1.4rem; }
+    .col-orig { display: none; }
+    button { padding: 8px 14px; font-size: 0.83rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🗺️ Tách Địa Chỉ Việt Nam</h1>
+    <p>Tự động tách Tỉnh · Xã/Phường · Thông tin còn lại từ địa chỉ thô</p>
+  </header>
+
+  <div class="input-area">
+    <label>📋 Dán danh sách địa chỉ (mỗi dòng 1 địa chỉ)</label>
+    <textarea id="inputAddr" placeholder="Ví dụ:&#10;Thôn Tháp Nhuận - Xã Đan Điền - Thành Phố Huế&#10;Ấp 7 - Xã Mỹ Thành - Đồng Tháp&#10;Tổ 3 Ấp Mỹ Đức - Bình Cơ - Tp.HCM"></textarea>
+    <div class="hint">
+      <b>Mẹo:</b> Công cụ nhận dạng tên tỉnh/thành viết tắt (Tp.HCM, HCM, TPHCM…) và tên xã/phường không cần prefix. Có thể phân cách bằng dấu <b>-</b>, <b>/</b>, <b>,</b>.
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="parseAll()">⚡ Phân tích</button>
+      <button class="btn-secondary" onclick="loadSample()">📄 Nạp ví dụ</button>
+      <button class="btn-secondary" onclick="clearAll()">🗑 Xóa</button>
+      <button class="btn-copy" id="btnCopy" onclick="copyToExcel()">📋 Copy sang Excel</button>
+      <button class="btn-export" onclick="exportCSV()">⬇ Xuất CSV</button>
+    </div>
+  </div>
+
+  <div class="copy-toast" id="copyToast">✅ Đã copy! Paste thẳng vào Excel (Ctrl+V)</div>
+
+  <div class="stats-row" id="statsRow" style="display:none">
+    <div class="stat-card total"><div class="num" id="statTotal">0</div><div class="lbl">Tổng dòng</div></div>
+    <div class="stat-card ok"><div class="num" id="statOk">0</div><div class="lbl">Tìm đủ 2 cấp</div></div>
+    <div class="stat-card warn"><div class="num" id="statPartial">0</div><div class="lbl">Chỉ có tỉnh</div></div>
+    <div class="stat-card" style="--c:var(--danger)"><div class="num" id="statFail" style="color:var(--danger)">0</div><div class="lbl">Không nhận diện</div></div>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-header">
+      <span>Kết quả phân tích</span>
+      <div class="filter-row">
+        <select id="filterStatus" onchange="renderTable()">
+          <option value="">Tất cả</option>
+          <option value="ok">Đủ 2 cấp</option>
+          <option value="partial">Chỉ tỉnh</option>
+          <option value="fail">Không nhận</option>
+        </select>
+        <input type="text" id="filterText" placeholder="🔍 Tìm kiếm…" oninput="renderTable()">
+      </div>
+    </div>
+    <div class="scroll-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="col-no">#</th>
+            <th class="col-orig">Địa chỉ gốc</th>
+            <th class="col-tinh">Tỉnh / Thành phố</th>
+            <th class="col-xa">Xã / Phường / TT</th>
+            <th class="col-rest">Thông tin còn lại</th>
+            <th class="col-status">Trạng thái</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr><td colspan="6"><div class="empty-state"><div class="icon">📭</div>Dán địa chỉ vào ô trên và nhấn Phân tích</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== DỮ LIỆU MAPPING =====
+const PROVINCES = {
+  "01": "Thành phố Hà Nội",
+  "04": "Tỉnh Cao Bằng",
+  "08": "Tỉnh Tuyên Quang",
+  "11": "Tỉnh Điện Biên",
+  "12": "Tỉnh Lai Châu",
+  "14": "Tỉnh Sơn La",
+  "15": "Tỉnh Lào Cai",
+  "19": "Tỉnh Thái Nguyên",
+  "20": "Tỉnh Lạng Sơn",
+  "22": "Tỉnh Quảng Ninh",
+  "24": "Tỉnh Bắc Ninh",
+  "25": "Tỉnh Phú Thọ",
+  "31": "Thành phố Hải Phòng",
+  "33": "Tỉnh Hưng Yên",
+  "37": "Tỉnh Ninh Bình",
+  "38": "Tỉnh Thanh Hóa",
+  "40": "Tỉnh Nghệ An",
+  "42": "Tỉnh Hà Tĩnh",
+  "44": "Tỉnh Quảng Bình",
+  "46": "Thành phố Huế",
+  "48": "Thành phố Đà Nẵng",
+  "51": "Tỉnh Quảng Ngãi",
+  "52": "Tỉnh Gia Lai",
+  "56": "Tỉnh Khánh Hòa",
+  "66": "Tỉnh Đắk Lắk",
+  "68": "Tỉnh Lâm Đồng",
+  "75": "Tỉnh Đồng Nai",
+  "79": "Thành phố Hồ Chí Minh",
+  "80": "Tỉnh Tây Ninh",
+  "82": "Tỉnh Đồng Tháp",
+  "86": "Tỉnh Vĩnh Long",
+  "91": "Tỉnh An Giang",
+  "92": "Thành phố Cần Thơ",
+  "96": "Tỉnh Cà Mau"
+};
+
+// Raw ward data: "wardName\tmã_huyện\tmã_tỉnh"
+const WARD_RAW = `Phường Hoàn Kiếm	00070	01
+Phường Cửa Nam	00082	01
+Phường Ba Đình	00004	01
+Phường Ngọc Hà	00008	01
+Phường Giảng Võ	00025	01
+Phường Hai Bà Trưng	00256	01
+Phường Vĩnh Tuy	00283	01
+Phường Bạch Mai	00292	01
+Phường Đống Đa	00235	01
+Phường Kim Liên	00229	01
+Phường Văn Miếu - Quốc Tử Giám	00226	01
+Phường Láng	00199	01
+Phường Ô Chợ Dừa	00190	01
+Phường Hồng Hà	00097	01
+Phường Lĩnh Nam	00328	01
+Phường Hoàng Mai	00331	01
+Phường Vĩnh Hưng	00301	01
+Phường Tương Mai	00322	01
+Phường Định Công	00316	01
+Phường Hoàng Liệt	00337	01
+Phường Yên Sở	00340	01
+Phường Thanh Xuân	00367	01
+Phường Khương Đình	00364	01
+Phường Phương Liệt	00352	01
+Phường Cầu Giấy	00166	01
+Phường Nghĩa Đô	00160	01
+Phường Yên Hòa	00175	01
+Phường Tây Hồ	00103	01
+Phường Phú Thượng	00091	01
+Phường Tây Tựu	00613	01
+Phường Phú Diễn	00619	01
+Phường Xuân Đỉnh	00611	01
+Phường Đông Ngạc	00602	01
+Phường Thượng Cát	00598	01
+Phường Từ Liêm	00592	01
+Phường Xuân Phương	00622	01
+Phường Tây Mỗ	00634	01
+Phường Đại Mỗ	00637	01
+Phường Long Biên	00145	01
+Phường Bồ Đề	00118	01
+Phường Việt Hưng	00127	01
+Phường Phúc Lợi	00136	01
+Phường Hà Đông	09556	01
+Phường Dương Nội	09886	01
+Phường Yên Nghĩa	09562	01
+Phường Phú Lương	09568	01
+Phường Kiến Hưng	09552	01
+Xã Thanh Trì	00640	01
+Xã Đại Thanh	00664	01
+Xã Nam Phù	00685	01
+Xã Ngọc Hồi	00679	01
+Phường Thanh Liệt	00643	01
+Xã Thượng Phúc	10231	01
+Xã Thường Tín	10183	01
+Xã Chương Dương	10237	01
+Xã Hồng Vân	10210	01
+Xã Phú Xuyên	10273	01
+Xã Phượng Dực	10279	01
+Xã Chuyên Mỹ	10330	01
+Xã Đại Xuyên	10342	01
+Xã Thanh Oai	10114	01
+Xã Bình Minh	10126	01
+Xã Tam Hưng	10144	01
+Xã Dân Hòa	10180	01
+Xã Vân Đình	10354	01
+Xã Ứng Thiên	10369	01
+Xã Hòa Xá	10417	01
+Xã Ứng Hòa	10402	01
+Xã Mỹ Đức	10441	01
+Xã Hồng Sơn	10465	01
+Xã Phúc Sơn	10459	01
+Xã Hương Sơn	10489	01
+Phường Chương Mỹ	10015	01
+Xã Phú Nghĩa	10030	01
+Xã Xuân Mai	10045	01
+Xã Trần Phú	10081	01
+Xã Hòa Phú	10096	01
+Xã Quảng Bị	10072	01
+Xã Minh Châu	09661	01
+Xã Quảng Oai	09619	01
+Xã Vật Lại	09664	01
+Xã Cổ Đô	09634	01
+Xã Bất Bạt	09676	01
+Xã Suối Hai	09694	01
+Xã Ba Vì	09700	01
+Xã Yên Bài	09706	01
+Phường Sơn Tây	09574	01
+Phường Tùng Thiện	09604	01
+Xã Đoài Phương	09616	01
+Xã Phúc Thọ	09715	01
+Xã Phúc Lộc	09739	01
+Xã Hát Môn	09772	01
+Xã Thạch Thất	09955	01
+Xã Hạ Bằng	09982	01
+Xã Tây Phương	10003	01
+Xã Hòa Lạc	09988	01
+Xã Quốc Oai	09895	01
+Xã Hoài Đức	09832	01
+Xã Sơn Đồng	09871	01
+Xã An Khánh	09877	01
+Xã Đan Phượng	09784	01
+Xã Liên Minh	09787	01
+Xã Gia Lâm	00565	01
+Xã Bát Tràng	00577	01
+Xã Phù Đổng	00541	01
+Xã Đông Anh	00454	01
+Xã Mê Linh	09022	01
+Xã Sóc Sơn	00376	01
+Xã Đan Điền	19885	46
+Xã Quảng Điền	19867	46
+Xã Phú Vinh	19945	46
+Xã Phú Hồ	19918	46
+Xã Phú Vang	19942	46
+Phường Thuận An	19900	46
+Phường Hóa Châu	20014	46
+Phường Mỹ Thượng	19930	46
+Phường Vỹ Dạ	19777	46
+Phường Thuận Hóa	19789	46
+Phường An Cựu	19815	46
+Phường Thủy Xuân	19813	46
+Phường Kim Long	19774	46
+Phường Hương An	19804	46
+Phường Phú Xuân	19753	46
+Phường Hương Trà	19996	46
+Phường Kim Trà	20017	46
+Phường Thanh Thủy	19969	46
+Phường Hương Thủy	19975	46
+Phường Phú Bài	19960	46
+Phường Phong Điền	19819	46
+Phường Phong Thái	19858	46
+Phường Phong Dinh	19831	46
+Phường Phong Phú	19828	46
+Phường Phong Quảng	19873	46
+Xã Bình Hòa	30607	91
+Xã Cần Đăng	30595	91
+Xã Vĩnh Hanh	30619	91
+Xã Vĩnh An	30604	91
+Xã Chợ Mới	30628	91
+Xã Hội An	30673	91
+Xã Long Điền	30631	91
+Xã Mỹ Hòa Hưng	30313	91
+Phường Long Xuyên	30307	91
+Phường Bình Đức	30292	91
+Phường Mỹ Thới	30301	91
+Phường Châu Đốc	30316	91
+Phường Vĩnh Tế	30325	91
+Xã An Phú	30337	91
+Xã Tịnh Biên	30520	91
+Xã Vĩnh Điều	30793	91
+Xã Mỹ Thành	28456	82
+Xã Tân Phước 1	28321	82
+Xã Tháp Mười	30037	82
+Xã Cao Lãnh	29869	82
+Phường Cao Lãnh	29869	82
+Phường Mỹ Ngãi	29884	82
+Phường Mỹ Trà	29888	82
+Xã Tân Hồng	29926	82
+Phường Hồng Ngự	29955	82
+Xã Lấp Vò	30169	82
+Xã Lai Vung	30226	82
+Phường Sa Đéc	29905	82
+Xã Hiệp Hưng	31396	92
+Xã Phụng Hiệp	31420	92
+Xã Thạnh Hòa	31408	92
+Phường Phú Lợi	31510	92
+Phường Sóc Trăng	31507	92
+Phường Ngã Bảy	31340	92
+Phường Ninh Kiều	31135	92
+Phường Cái Khế	31120	92
+Phường Tân An	31147	92
+Phường Bình Thủy	31168	92
+Phường Ô Môn	31153	92
+Phường Thốt Nốt	31207	92
+Xã Vĩnh Thạnh	31232	92
+Xã Phong Điền	31299	92
+Xã Thới Lai	31258	92
+Xã Cờ Đỏ	31261	92
+Xã Mỹ Tú	31567	92
+Xã Long Hưng	31579	92
+Xã Mỹ Xuyên	31684	92
+Phường Mỹ Xuyên	31684	92
+Phường Ngã Năm	31732	92
+Xã Kế Sách	31528	92
+Xã An Thạnh	31615	92
+Phường An Xuyên	32002	96
+Phường Lý Văn Lâm	32014	96
+Phường Tân Thành	32025	96
+Xã Tân Thuận	32167	96
+Xã Đầm Dơi	32152	96
+Xã U Minh	32047	96
+Xã Thới Bình	32065	96
+Xã Trần Văn Thời	32095	96
+Xã Sông Đốc	32098	96
+Xã Năm Căn	32191	96
+Xã Phan Ngọc Hiển	32244	96
+Xã Đất Mũi	32248	96
+Xã Cái Nước	32128	96
+Phường Bạc Liêu	31825	96
+Phường Giá Rai	31942	96
+Xã Gành Hào	31972	96
+Xã Hồng Dân	31843	96
+Xã Bình Cơ	25915	79
+Phường Bình Cơ	25915	79
+Xã Hiệp Phước	27658	79
+Xã Bình Chánh	27637	79
+Xã Hóc Môn	27559	79
+Xã Củ Chi	27553	79
+Xã Cần Giờ	27664	79
+Phường Sài Gòn	26740	79
+Phường Tân Định	26737	79
+Phường Bến Thành	26743	79
+Phường Bình Thạnh	26929	79
+Phường Gò Vấp	26884	79
+Phường Phú Nhuận	27073	79
+Phường Tân Bình	27004	79
+Phường Tân Phú	27031	79
+Phường Bình Tân	27442	79
+Phường Thủ Đức	26824	79
+Phường Bình Hưng Hòa	27439	79
+Phường Phú Thọ	27226	79
+Phường Bình Đông	27424	79
+Phường Chợ Lớn	27343	79
+Xã Bình Mỹ	27544	79
+Phường Dĩ An	25942	79
+Phường Thuận An	25978	79
+Phường Bình Dương	25760	79
+Phường Thủ Dầu Một	25747	79
+Phường Tân Uyên	25888	79
+Phường Bến Cát	25813	79
+Phường Hòa Lợi	25849	79
+Xã Phú Giáo	25858	79
+Xã Bàu Bàng	25822	79
+Xã Dầu Tiếng	25777	79
+Phường Vũng Tàu	26506	79
+Phường Bà Rịa	26560	79
+Phường Phú Mỹ	26704	79
+Xã Xuyên Mộc	26632	79
+Xã Long Điền	26659	79
+Xã Đất Đỏ	26680	79
+Xã Phước Hòa	25882	79
+Phường Biên Hòa	26068	75
+Phường Long Khánh	26080	75
+Xã Long Thành	26368	75
+Xã Nhơn Trạch	26485	75
+Xã Trảng Bom	26248	75
+Xã Định Quán	26206	75
+Xã Tân Phú	26116	75
+Xã Cẩm Mỹ	26341	75
+Phường Đồng Xoài	25210	75
+Phường Bình Phước	25195	75
+Phường Bình Long	25326	75
+Phường An Lộc	25333	75
+Xã Lộc Ninh	25270	75
+Xã Bù Đăng	25396	75
+Phường Minh Hưng	25441	75
+Phường Chơn Thành	25432	75
+Xã Phước Bình	25220	75
+Phường Phước Long	25217	75
+Phường Tây Ninh	25567	80
+Phường Trảng Bàng	25708	80
+Phường Gò Dầu	25654	80
+Xã Dương Minh Châu	25552	80
+Xã Tân Châu	25516	80
+Xã Tân Biên	25486	80
+Xã Bến Cầu	25681	80
+Xã Tân Hưng	27721	80
+Phường Kiến Tường	27787	80
+Phường Long An	27694	80
+Phường Tân An	27712	80
+Xã Đức Hòa	27937	80
+Xã Bến Lức	27991	80
+Xã Cần Đước	28108	80
+Xã Cần Giuộc	28159	80
+Phường Mỹ Tho	28261	82
+Phường Cai Lậy	28439	82
+Phường Gò Công	28306	82
+Xã Cái Bè	28360	82
+Xã Tiền Hải	12970	33
+Xã Quỳnh Phụ	12472	33
+Xã Đông Hưng	12688	33
+Xã Kiến Xương	13075	33
+Xã Vũ Thư	13192	33
+Phường Trần Lãm	12454	33
+Phường Vũ Phúc	12466	33
+Phường Mỹ Hào	12103	33
+Phường Phố Hiến	11953	33
+Xã Tiên Lữ	12364	33
+Xã Khoái Châu	12205	33
+Xã Yên Mỹ	12073	33
+Xã Văn Giang	12019	33
+Xã Nguyễn Lương Bằng	11242	31
+Xã Nam Thanh Miện	11284	31
+Xã Thanh Miện	11239	31
+Xã Gia Lộc	10999	31
+Xã Tứ Kỳ	11074	31
+Xã Ninh Giang	11203	31
+Xã Nam Sách	10606	31
+Xã Thanh Hà	10813	31
+Phường Hải Dương	10525	31
+Phường Chí Linh	10546	31
+Phường Kinh Môn	10675	31
+Xã Kim Thành	10804	31
+Xã Tiên Lãng	11755	31
+Xã Vĩnh Bảo	11824	31
+Phường Hồng Bàng	11311	31
+Phường Ngô Quyền	11329	31
+Phường Lê Chân	11383	31
+Phường Hải An	11413	31
+Phường Kiến An	11443	31
+Phường Đồ Sơn	11455	31
+Phường Dương Kinh	11692	31
+Phường Thủy Nguyên	11560	31
+Xã An Lão	11629	31
+Xã Kiến Thụy	11680	31
+Xã Tiên Trang	16549	38
+Xã Hà Trung	15271	38
+Xã Hoằng Hóa	15865	38
+Xã Nga Sơn	16093	38
+Xã Hậu Lộc	16012	38
+Xã Nông Cống	16279	38
+Xã Triệu Sơn	15664	38
+Xã Thọ Xuân	15499	38
+Phường Hạc Thành	14797	38
+Phường Sầm Sơn	16531	38
+Phường Bỉm Sơn	14812	38
+Phường Tĩnh Gia	16561	38
+Phường Nghi Sơn	16654	38
+Xã Mường Lát	14845	38
+Xã Bá Thước	14923	38
+Xã Ngọc Lặc	15061	38
+Xã Cẩm Thủy	15127	38
+Xã Như Xuân	16174	38
+Xã Như Thanh	16228	38
+Xã Vĩnh Lộc	15349	38
+Xã Thạch Hà	18562	42
+Xã Can Lộc	18406	42
+Xã Hương Sơn	18133	42
+Xã Hương Khê	18496	42
+Xã Đức Thọ	18229	42
+Xã Nghi Xuân	18352	42
+Xã Cẩm Xuyên	18673	42
+Xã Kỳ Anh	18775	42
+Phường Thành Sen	18073	42
+Phường Trần Phú	18100	42
+Phường Sông Trí	18754	42
+Phường Vũng Áng	18823	42
+Xã Đồng Hới	18880	44
+Phường Đồng Hới	18880	44
+Phường Ba Đồn	19009	44
+Xã Phong Nha	19138	44
+Xã Bố Trạch	19141	44
+Xã Quảng Ninh	19207	44
+Xã Lệ Thủy	19249	44
+Phường Đông Hà	19333	44
+Phường Quảng Trị	19360	44
+Xã Vĩnh Linh	19363	44
+Xã Gio Linh	19495	44
+Xã Đakrông	19564	44
+Xã Cam Lộ	19597	44
+Xã Triệu Phong	19624	44
+Xã Hải Lăng	19702	44
+Phường Hải Châu	20242	48
+Phường Thanh Khê	20209	48
+Phường Sơn Trà	20263	48
+Phường Ngũ Hành Sơn	20285	48
+Phường Hòa Khánh	20200	48
+Phường Cẩm Lệ	20260	48
+Xã Hòa Vang	20320	48
+Phường Tam Kỳ	20341	48
+Phường Hội An	20410	48
+Xã Đại Lộc	20500	48
+Xã Điện Bàn	20551	48
+Phường Điện Bàn	20551	48
+Xã Duy Xuyên	20623	48
+Xã Thăng Bình	20791	48
+Xã Nam Giang	20707	48
+Phường Kon Tum	23293	51
+Phường Quy Nhơn	21583	52
+Phường Bình Định	21907	52
+Phường An Nhơn	21910	52
+Phường Bồng Sơn	21640	52
+Xã Phù Cát	21853	52
+Xã Phù Mỹ	21730	52
+Xã Tuy Phước	21952	52
+Xã Vân Canh	21994	52
+Xã An Lão	21609	52
+Xã Hoài Ân	21688	52
+Phường Pleiku	23575	52
+Phường An Khê	23617	52
+Xã Kbang	23638	52
+Xã Chư Sê	23941	52
+Xã Chư Prông	23887	52
+Xã Ia Grai	23764	52
+Phường Ayun Pa	24044	52
+Xã Ia Pa	24022	52
+Xã Đak Đoa	23677	52
+Xã Mang Yang	23794	52
+Phường Nha Trang	22366	56
+Phường Cam Ranh	22420	56
+Phường Ninh Hòa	22528	56
+Xã Vạn Ninh	22489	56
+Xã Diên Khánh	22651	56
+Xã Cam Lâm	22453	56
+Xã Khánh Vĩnh	22609	56
+Xã Khánh Sơn	22714	56
+Phường Phan Rang	22759	56
+Xã Ninh Phước	22870	56
+Xã Ninh Hải	22852	56
+Xã Ninh Sơn	22810	56
+Xã Bác Ái	22795	56
+Phường Buôn Ma Thuột	24133	66
+Phường Buôn Hồ	24305	66
+Xã Ea Súp	24211	66
+Xã Cư M'gar	24280	66
+Xã Krông Pắc	24490	66
+Xã Krông Bông	24448	66
+Xã Ea Kar	24373	66
+Xã M'Drắk	24412	66
+Xã Lắk	24580	66
+Xã Liên Sơn Lắk	24580	66
+Xã Krông Ana	24538	66
+Phường Tuy Hòa	22015	66
+Phường Sông Cầu	22051	66
+Phường Đông Hòa	22258	66
+Xã Tuy An Đông	22120	66
+Xã Sơn Hòa	22165	66
+Xã Sông Hinh	22207	66
+Xã Đồng Xuân	22081	66
+Phường Xuân Hương - Đà Lạt	24781	68
+Phường Bảo Lộc	24823	68
+Xã Lạc Dương	24848	68
+Xã Đơn Dương	24931	68
+Xã Đức Trọng	24958	68
+Xã Di Linh	25000	68
+Xã Bảo Lâm 1	25054	68
+Xã Đạ Huoai	25099	68
+Xã Đạ Tẻh	25126	68
+Xã Cát Tiên	25159	68
+Phường Phan Thiết	22945	68
+Phường La Gi	23235	68
+Xã Tuy Phong	22978	68
+Xã Bắc Bình	23005	68
+Xã Hàm Thuận Bắc	23089	68
+Xã Hàm Thuận Nam	23110	68
+Xã Hàm Tân	23236	68
+Xã Tánh Linh	23149	68
+Xã Đức Linh	23191	68
+Phường Bắc Gia Nghĩa	24611	68
+Xã Cư Jút	24640	68
+Xã Đắk Mil	24670	68
+Xã Krông Nô	24688	68
+Xã Đắk Song	24718	68
+Xã Tuy Đức	24739	68
+Xã Nhân Cơ	24751	68
+Xã Gia Viễn	14464	37
+Xã Nho Quan	14428	37
+Xã Yên Khánh	14560	37
+Xã Yên Mô	14701	37
+Xã Kim Sơn	14638	37
+Phường Hoa Lư	14329	37
+Phường Tam Điệp	14362	37
+Phường Hà Nam	13366	37
+Phường Phủ Lý	13285	37
+Phường Duy Tiên	13324	37
+Xã Bình Lục	13504	37
+Xã Lý Nhân	13573	37
+Phường Nam Định	13669	37
+Phường Thiên Trường	13684	37
+Xã Nam Trực	13966	37
+Xã Trực Ninh	14053	37
+Xã Xuân Trường	14089	37
+Xã Hải Hậu	14215	37
+Xã Giao Thủy	14167	37
+Xã Nghĩa Hưng	13891	37
+Xã Vụ Bản	13741	37
+Xã Ý Yên	13795	37
+Phường Việt Trì	07900	25
+Phường Phú Thọ	07942	25
+Phường Phong Châu	07954	25
+Xã Đoan Hùng	07969	25
+Xã Thanh Ba	08152	25
+Xã Cẩm Khê	08341	25
+Xã Thanh Sơn	08542	25
+Xã Tân Sơn	08566	25
+Xã Yên Lập	08290	25
+Xã Lập Thạch	08761	25
+Xã Tam Đảo	08911	25
+Xã Vĩnh Tường	09076	25
+Xã Yên Lạc	09025	25
+Xã Bình Xuyên	08950	25
+Phường Vĩnh Phúc	08716	25
+Phường Vĩnh Yên	08707	25
+Phường Phúc Yên	08740	25
+Xã Cao Phong	05089	25
+Xã Đà Bắc	04831	25
+Xã Kim Bôi	04978	25
+Xã Lạc Sơn	05266	25
+Xã Lạc Thủy	05392	25
+Xã Mai Châu	05200	25
+Xã Tân Lạc	05128	25
+Xã Yên Thủy	05353	25
+Phường Hòa Bình	04795	25
+Phường Phan Đình Phùng	05443	19
+Phường Gia Sàng	05467	19
+Xã Đại Từ	05830	19
+Xã Định Hóa	05569	19
+Xã Phú Lương	05611	19
+Xã Đồng Hỷ	05692	19
+Xã Phú Bình	05908	19
+Phường Phổ Yên	05860	19
+Phường Sông Công	05518	19
+Xã Võ Nhai	05716	19
+Phường Thục Phán	01273	04
+Phường Bắc Kạn	01843	04
+Xã Nguyên Bình	01726	04
+Xã Trùng Khánh	01477	04
+Xã Hạ Lang	01558	04
+Xã Quảng Uyên	01576	04
+Xã Phục Hòa	01648	04
+Xã Hòa An	01654	04
+Xã Thạch An	01807	04
+Xã Thất Khê	06040	20
+Phường Kỳ Lừa	06187	20
+Xã Bình Gia	06112	20
+Xã Bắc Sơn	06325	20
+Xã Văn Quan	06253	20
+Xã Hữu Lũng	06385	20
+Xã Chi Lăng	06463	20
+Xã Cao Lộc	06211	20
+Xã Đình Lập	06613	20
+Xã Lộc Bình	06529	20
+Phường An Sinh	07090	22
+Phường Đông Triều	07093	22
+Phường Mạo Khê	07069	22
+Phường Uông Bí	06811	22
+Phường Hạ Long	06688	22
+Phường Hồng Gai	06685	22
+Phường Cẩm Phả	06793	22
+Phường Cửa Ông	06781	22
+Phường Móng Cái 1	06712	22
+Xã Tiên Yên	06862	22
+Xã Ba Chẽ	06970	22
+Xã Đầm Hà	06895	22
+Xã Bình Liêu	06838	22
+Phường Tô Hiệu	03646	14
+Phường Mộc Châu	03980	14
+Xã Quỳnh Nhai	03703	14
+Xã Thuận Châu	03721	14
+Xã Mường La	03808	14
+Xã Bắc Yên	03856	14
+Xã Phù Yên	03910	14
+Xã Yên Châu	04075	14
+Xã Mai Sơn	04105	14
+Xã Sông Mã	04168	14
+Xã Sốp Cộp	04231	14
+Phường Điện Biên Phủ	03127	11
+Phường Mường Lay	03151	11
+Xã Tuần Giáo	03253	11
+Xã Tủa Chùa	03217	11
+Xã Mường Nhé	03160	11
+Xã Mường Chà	03166	11
+Xã Điện Biên	03127	11
+Xã Mường Kim	03637	12
+Xã Than Uyên	03595	12
+Xã Tân Uyên	03598	12
+Phường Tân Phong	03408	12
+Xã Sìn Hồ	03478	12
+Xã Mường Tè	03445	12
+Xã Phong Thổ	03549	12
+Phường Nghĩa Lộ	04288	15
+Xã Mù Cang Chải	04456	15
+Xã Trạm Tấu	04606	15
+Phường Yên Bái	04252	15
+Xã Trấn Yên	04498	15
+Xã Văn Chấn	04672	15
+Xã Lục Yên	04303	15
+Xã Yên Bình	04714	15
+Xã Bắc Hà	02839	15
+Xã Si Ma Cai	02809	15
+Xã Mường Khương	02761	15
+Phường Lào Cai	02647	15
+Phường Cam Đường	02671	15
+Xã Bát Xát	02683	15
+Xã Sa Pa	03006	15
+Phường Sa Pa	03006	15
+Xã Văn Bàn	03082	15
+Xã Bảo Yên	02947	15
+Xã Bảo Thắng	02905	15
+Xã Bắc Quang	01153	08
+Xã Chiêm Hóa	02287	08
+Xã Nà Hang	02221	08
+Xã Yên Sơn	02473	08
+Xã Sơn Dương	02536	08
+Phường Mỹ Lâm	02509	08
+Phường Hà Giang 1	00694	08
+Xã Vị Xuyên	00913	08
+Xã Đồng Văn	00721	08
+Xã Mèo Vạc	00769	08
+Xã Yên Minh	00820	08
+Xã Bắc Mê	00991	08
+Xã Hoàng Su Phì	01021	08
+Xã Xín Mần	01108	08
+Xã Quản Bạ	00874	08
+Xã Quang Bình	01237	08
+Xã Hàm Yên	02374	08
+Xã Bắc Quang	01153	08
+Xã Lâm Bình	02266	08
+Phường Mường Thanh	03334	11
+Xã Thanh Nưa	03328	11
+Xã Nà Tấu	03316	11
+Xã Mường Ảng	03256	11
+Xã Sơn Thủy	02620	08
+Xã Trung Hà	02305	08
+Phường An Tường	02512	08
+Phường Minh Xuân	02215	08
+Phường Nông Tiến	02212	08
+Xã Thượng Lâm	02269	08
+Phường Tích Lương	05500	19
+Phường Quyết Thắng	05455	19
+Phường Linh Sơn	05710	19
+Xã Tân Cương	05503	19
+Xã La Bằng	05818	19
+Xã Quân Chu	05851	19
+Xã Sảng Mộc	05719	19
+Xã Nghinh Tường	05722	19
+Xã La Hiên	05740	19
+Xã Bằng Thành	01864	19
+Xã Ba Bể	01906	19
+Xã Chợ Đồn	02020	19
+Xã Na Rì	02155	19
+Xã Ngân Sơn	01954	19
+Phường Đức Xuân	01840	19
+Xã Văn Lang	02143	19
+Xã Chợ Mới	02086	19
+Xã Hiếu Giang	19603	44
+Phường Hà Huy Tập	18652	42
+Phường Bắc Hồng Lĩnh	18115	42
+Phường Nam Hồng Lĩnh	18118	42
+Xã Tiên Điền	18373	42
+Xã Hương Bình	18523	42
+Xã Phúc Trạch	18547	42
+Xã Vũ Quang	18313	42
+Xã Kỳ Xuân	18766	42
+Xã Cẩm Duệ	18739	42
+Xã Lộc Hà	18568	42
+Phường Trương Quang Trọng	21172	51
+Phường Cẩm Thành	21025	51
+Xã Bình Sơn	21040	51
+Xã Tư Nghĩa	21235	51
+Xã Nghĩa Hành	21364	51
+Xã Trà Bồng	21115	51
+Xã Sơn Hà	21289	51
+Xã Sơn Tây	21340	51
+Xã Ba Tơ	21484	51
+Xã Minh Long	21361	51
+Phường Đức Phổ	21439	51
+Xã Mộ Đức	21400	51
+Phường Sa Huỳnh	21478	51
+Phường Trà Câu	21451	51
+Xã Quảng Ngãi	21028	51
+Phường Cẩm Thành	21025	51
+Xã Lưu Nghiệp Anh	29476	86
+Xã Trà Ôn	29821	86
+Xã Tam Bình	29719	86
+Xã Vũng Liêm	29701	86
+Xã Hiếu Phụng	29701	86
+Xã Cái Nhum	29641	86
+Xã Long Hồ	29602	86
+Phường Long Châu	29551	86
+Phường Bình Minh	29771	86
+Phường Trà Vinh	29242	86
+Xã Càng Long	29266	86
+Xã Cầu Kè	29308	86
+Xã Tiểu Cần	29341	86
+Xã Châu Thành	29374	86
+Xã Cầu Ngang	29416	86
+Xã Trà Cú	29461	86
+Phường Duyên Hải	29512	86
+Xã Tam Ngãi	29335	86
+Xã Ngãi Tứ	29767	86
+Phường An Hội	28777	86
+Phường Bến Tre	28789	86
+Xã Chợ Lách	28870	86
+Xã Mỏ Cày	28903	86
+Xã Giồng Trôm	28984	86
+Xã Ba Tri	29110	86
+Xã Thạnh Phú	29182	86
+Xã Bình Đại	29050	86
+Phường Mỹ Hào	12103	33
+Phường Thái Bình	13225	33
+Xã Hưng Hà	12586	33
+Xã Đông Hưng	12688	33
+Xã Quỳnh Lưu	12472	33
+Phường Bắc Ninh	09187	24
+Phường Từ Sơn	09367	24
+Phường Kinh Bắc	09187	24
+Phường Thuận Thành	09400	24
+Phường Quế Võ	09247	24
+Phường Gia Bình	09454	24
+Phường Lương Tài	09496	24
+Phường Yên Phong	09193	24
+Xã Tiên Du	09319	24
+Phường Bắc Giang	07210	24
+Phường Lạng Giang	07375	24
+Phường Lục Ngạn	07582	24
+Phường Sơn Động	07615	24
+Xã Lục Nam	07444	24
+Phường Việt Yên	07777	24
+Phường Yên Dũng	07681	24
+Phường Hiệp Hòa	07840	24`;
+
+// Build ward lookup
+const wardsByTinh = {}; // maTinh -> [{fullName, simpleName, maTinh}]
+const allWards = [];
+
+WARD_RAW.trim().split('\n').forEach(line => {
+  const parts = line.split('\t');
+  if (parts.length < 3) return;
+  const [fullName, , maTinh] = parts;
+  const trimmed = fullName.trim();
+  const simpleName = trimmed.replace(/^(Phường|Xã|Thị trấn|TT|P\.|X\.)\s*/i, '').trim();
+  const entry = { fullName: trimmed, simpleName, maTinh: maTinh.trim() };
+  allWards.push(entry);
+  if (!wardsByTinh[maTinh.trim()]) wardsByTinh[maTinh.trim()] = [];
+  wardsByTinh[maTinh.trim()].push(entry);
+});
+
+// Province aliases
+const PROV_ALIASES = {
+  "hcm": "79", "tphcm": "79", "tp.hcm": "79", "tp hcm": "79", "saigon": "79", "sài gòn": "79",
+  "hà nội": "01", "hanoi": "01", "hn": "01",
+  "hải phòng": "31", "hp": "31",
+  "đà nẵng": "48", "da nang": "48", "dn": "48",
+  "cần thơ": "92", "can tho": "92", "ct": "92",
+  "huế": "46", "hue": "46", "t.t.huế": "46", "thành phố huế": "46", "tt huế": "46", "thua thien hue": "46",
+  "nghệ an": "40", "na": "40",
+  "thanh hóa": "38", "thanh hoa": "38",
+  "hà tĩnh": "42", "ha tinh": "42",
+  "quảng bình": "44", "quang binh": "44",
+  "quảng trị": "44", "quang tri": "44",
+  "quảng ngãi": "51", "quang ngai": "51",
+  "gia lai": "52",
+  "khánh hòa": "56", "khanh hoa": "56",
+  "đắk lắk": "66", "dak lak": "66", "đắk lắc": "66",
+  "lâm đồng": "68", "lam dong": "68",
+  "đồng nai": "75", "dong nai": "75",
+  "tây ninh": "80", "tay ninh": "80",
+  "đồng tháp": "82", "dong thap": "82", "dt": "82",
+  "vĩnh long": "86", "vinh long": "86", "vl": "86",
+  "an giang": "91", "ag": "91",
+  "cà mau": "96", "ca mau": "96", "cm": "96",
+  "cao bằng": "04", "cao bang": "04",
+  "tuyên quang": "08", "tuyen quang": "08",
+  "điện biên": "11", "dien bien": "11",
+  "lai châu": "12", "lai chau": "12",
+  "sơn la": "14", "son la": "14",
+  "lào cai": "15", "lao cai": "15", "lc": "15",
+  "thái nguyên": "19", "thai nguyen": "19",
+  "lạng sơn": "20", "lang son": "20", "ls": "20",
+  "quảng ninh": "22", "quang ninh": "22", "qn": "22",
+  "bắc ninh": "24", "bac ninh": "24", "bn": "24",
+  "phú thọ": "25", "phu tho": "25", "pt": "25",
+  "hưng yên": "33", "hung yen": "33", "hy": "33",
+  "ninh bình": "37", "ninh binh": "37", "nb": "37",
+  "bắc giang": "24", "bac giang": "24", "bg": "24",
+  "bình dương": "79", "binh duong": "79", "bd": "79",
+  "bình phước": "75", "binh phuoc": "75", "bp": "75",
+  "bà rịa - vũng tàu": "79", "brvt": "79", "vũng tàu": "79", "vung tau": "79",
+  "long an": "80", "la": "80",
+  "tiền giang": "82", "tien giang": "82", "tg": "82",
+  "bến tre": "86", "ben tre": "86", "bt": "86",
+  "trà vinh": "86", "tra vinh": "86", "tv": "86",
+  "kiên giang": "91", "kien giang": "91", "kg": "91",
+  "sóc trăng": "92", "soc trang": "92", "st": "92",
+  "bạc liêu": "96", "bac lieu": "96", "bl": "96",
+  "hà nam": "37", "ha nam": "37", "hn2": "37",
+  "nam định": "37", "nam dinh": "37", "nd": "37",
+  "thái bình": "33", "thai binh": "33", "tb": "33",
+  "bình định": "52", "binh dinh": "52", "bdi": "52",
+  "phú yên": "66", "phu yen": "66", "py": "66",
+  "kon tum": "51", "kt": "51",
+  "đắk nông": "68", "dak nong": "68",
+  "ninh thuận": "56", "ninh thuan": "56", "nt": "56",
+  "bình thuận": "68", "binh thuan": "68", "bth": "68",
+  "vĩnh phúc": "25", "vinh phuc": "25", "vp": "25",
+  "hòa bình": "25", "hoa binh": "25", "hb": "25",
+  "yên bái": "15", "yen bai": "15", "yb": "15",
+  "hà giang": "08", "ha giang": "08", "hg": "08",
+  "bắc kạn": "19", "bac kan": "19", "bk": "19",
+  "tuyên quang 2": "08",
+};
+
+function normalize(s) {
+  return s.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd').replace(/[^\w\s]/g, ' ')
+    .replace(/\s+/g, ' ').trim();
+}
+
+function normViet(s) {
+  return s.toLowerCase().trim();
+}
+
+function findProvince(text) {
+  const t = normViet(text);
+  const tn = normalize(text);
+
+  // Direct match from province list
+  for (const [code, name] of Object.entries(PROVINCES)) {
+    const nm = normViet(name.replace(/^(Tỉnh|Thành phố)\s*/i, ''));
+    if (t.includes(nm) || tn.includes(normalize(nm))) return code;
+    if (t.includes(normViet(name)) || tn.includes(normalize(name))) return code;
+  }
+
+  // Alias match
+  for (const [alias, code] of Object.entries(PROV_ALIASES)) {
+    if (t.includes(alias) || tn.includes(normalize(alias))) return code;
+  }
+  return null;
+}
+
+function findWard(text, maTinh) {
+  const tn = normalize(text);
+  const pool = maTinh ? (wardsByTinh[maTinh] || []) : allWards;
+
+  // Try exact full name
+  for (const w of pool) {
+    if (normalize(w.fullName) === tn || normalize(w.simpleName) === tn) return w;
+  }
+  // Substring match (full name)
+  for (const w of pool) {
+    if (tn.includes(normalize(w.fullName)) || tn.includes(normalize(w.simpleName))) return w;
+  }
+  // Reverse: ward name contains text
+  for (const w of pool) {
+    const wn = normalize(w.simpleName);
+    if (wn && tn.includes(wn) && wn.length > 3) return w;
+  }
+  return null;
+}
+
+function splitSegments(addr) {
+  return addr.split(/\s*[-–/,]\s*/).map(s => s.trim()).filter(Boolean);
+}
+
+function parseAddress(rawAddr) {
+  const addr = rawAddr.trim();
+  if (!addr) return null;
+
+  const segs = splitSegments(addr);
+  let maTinh = null, foundWard = null;
+
+  // Find province in last 2 segments first (more specific)
+  for (let i = segs.length - 1; i >= 0; i--) {
+    const code = findProvince(segs[i]);
+    if (code) { maTinh = code; break; }
+  }
+  // If not found, try full string
+  if (!maTinh) maTinh = findProvince(addr);
+
+  // Find ward
+  const tinhName = maTinh ? PROVINCES[maTinh] : null;
+  for (let i = 0; i < segs.length; i++) {
+    const seg = segs[i];
+    const w = findWard(seg, maTinh);
+    if (w) { foundWard = w; break; }
+  }
+
+  // Build "rest" = segments not used for province or ward
+  let usedSegs = new Set();
+  if (maTinh) {
+    segs.forEach((s, i) => { if (findProvince(s) === maTinh) usedSegs.add(i); });
+  }
+  if (foundWard) {
+    segs.forEach((s, i) => {
+      const w = findWard(s, maTinh);
+      if (w && w.fullName === foundWard.fullName) usedSegs.add(i);
+    });
+  }
+
+  const restParts = segs.filter((_, i) => !usedSegs.has(i));
+  const rest = restParts.join(' - ');
+
+  const status = maTinh && foundWard ? 'ok' : (maTinh ? 'partial' : 'fail');
+
+  return {
+    original: addr,
+    tinh: tinhName || '',
+    xa: foundWard ? foundWard.fullName : '',
+    rest,
+    status
+  };
+}
+
+let results = [];
+
+function parseAll() {
+  const lines = document.getElementById('inputAddr').value.split('\n').map(l => l.trim()).filter(Boolean);
+  results = lines.map(l => parseAddress(l)).filter(Boolean);
+  updateStats();
+  renderTable();
+  document.getElementById('statsRow').style.display = 'flex';
+}
+
+function updateStats() {
+  document.getElementById('statTotal').textContent = results.length;
+  document.getElementById('statOk').textContent = results.filter(r => r.status === 'ok').length;
+  document.getElementById('statPartial').textContent = results.filter(r => r.status === 'partial').length;
+  document.getElementById('statFail').textContent = results.filter(r => r.status === 'fail').length;
+}
+
+function renderTable() {
+  const filterStatus = document.getElementById('filterStatus').value;
+  const filterText = document.getElementById('filterText').value.toLowerCase();
+
+  let filtered = results;
+  if (filterStatus) filtered = filtered.filter(r => r.status === filterStatus);
+  if (filterText) filtered = filtered.filter(r =>
+    r.original.toLowerCase().includes(filterText) ||
+    r.tinh.toLowerCase().includes(filterText) ||
+    r.xa.toLowerCase().includes(filterText) ||
+    r.rest.toLowerCase().includes(filterText)
+  );
+
+  const tbody = document.getElementById('tableBody');
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="icon">🔍</div>Không có kết quả phù hợp</div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtered.map((r, i) => {
+    const tagClass = r.status === 'ok' ? 'tag-ok' : r.status === 'partial' ? 'tag-partial' : 'tag-fail';
+    const tagText = r.status === 'ok' ? '✓ Đủ 2 cấp' : r.status === 'partial' ? '~ Chỉ tỉnh' : '✗ Không nhận';
+    return `<tr>
+      <td class="col-no">${i + 1}</td>
+      <td class="col-orig" title="${escHtml(r.original)}">${escHtml(r.original.length > 50 ? r.original.slice(0,50)+'…' : r.original)}</td>
+      <td class="col-tinh">${escHtml(r.tinh)}</td>
+      <td class="col-xa">${escHtml(r.xa)}</td>
+      <td class="col-rest">${escHtml(r.rest)}</td>
+      <td class="col-status"><span class="tag ${tagClass}">${tagText}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function exportCSV() {
+  if (!results.length) { alert('Chưa có dữ liệu để xuất'); return; }
+  const filterStatus = document.getElementById('filterStatus').value;
+  const filterText = document.getElementById('filterText').value.toLowerCase();
+  let data = results;
+  if (filterStatus) data = data.filter(r => r.status === filterStatus);
+  if (filterText) data = data.filter(r =>
+    r.original.toLowerCase().includes(filterText) ||
+    r.tinh.toLowerCase().includes(filterText) ||
+    r.xa.toLowerCase().includes(filterText) ||
+    r.rest.toLowerCase().includes(filterText)
+  );
+
+  const BOM = '\uFEFF';
+  const header = 'Địa chỉ gốc,Tỉnh/Thành phố,Xã/Phường,Thông tin còn lại,Trạng thái\n';
+  const rows = data.map(r =>
+    [r.original, r.tinh, r.xa, r.rest, r.status === 'ok' ? 'Đủ 2 cấp' : r.status === 'partial' ? 'Chỉ tỉnh' : 'Không nhận']
+      .map(v => `"${v.replace(/"/g,'""')}"`)
+      .join(',')
+  ).join('\n');
+
+  const blob = new Blob([BOM + header + rows], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'dia_chi_phan_tich.csv';
+  a.click(); URL.revokeObjectURL(url);
+}
+
+function copyToExcel() {
+  if (!results.length) { alert('Chưa có dữ liệu để copy'); return; }
+
+  const filterStatus = document.getElementById('filterStatus').value;
+  const filterText = document.getElementById('filterText').value.toLowerCase();
+  let data = results;
+  if (filterStatus) data = data.filter(r => r.status === filterStatus);
+  if (filterText) data = data.filter(r =>
+    r.original.toLowerCase().includes(filterText) ||
+    r.tinh.toLowerCase().includes(filterText) ||
+    r.xa.toLowerCase().includes(filterText) ||
+    r.rest.toLowerCase().includes(filterText)
+  );
+
+  // Tab-separated values — Excel pastes each \t into a new cell, \n into a new row
+  const header = ['Địa chỉ gốc', 'Tỉnh / Thành phố', 'Xã / Phường', 'Thông tin còn lại', 'Trạng thái'].join('\t');
+  const rows = data.map(r =>
+    [r.original, r.tinh, r.xa, r.rest,
+     r.status === 'ok' ? 'Đủ 2 cấp' : r.status === 'partial' ? 'Chỉ tỉnh' : 'Không nhận'
+    ].join('\t')
+  );
+  const tsv = [header, ...rows].join('\n');
+
+  // Use clipboard API with HTML fallback for richer Excel compat
+  const htmlTable = buildHtmlTable(data);
+
+  if (navigator.clipboard && window.ClipboardItem) {
+    const textBlob = new Blob([tsv], { type: 'text/plain' });
+    const htmlBlob = new Blob([htmlTable], { type: 'text/html' });
+    navigator.clipboard.write([
+      new ClipboardItem({ 'text/plain': textBlob, 'text/html': htmlBlob })
+    ]).then(() => showCopyFeedback()).catch(() => fallbackCopy(tsv));
+  } else {
+    fallbackCopy(tsv);
+  }
+}
+
+function buildHtmlTable(data) {
+  const cols = ['Địa chỉ gốc', 'Tỉnh / Thành phố', 'Xã / Phường', 'Thông tin còn lại', 'Trạng thái'];
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const head = `<tr>${cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr>`;
+  const body = data.map(r => {
+    const status = r.status === 'ok' ? 'Đủ 2 cấp' : r.status === 'partial' ? 'Chỉ tỉnh' : 'Không nhận';
+    return `<tr>${[r.original, r.tinh, r.xa, r.rest, status].map(v => `<td>${esc(v)}</td>`).join('')}</tr>`;
+  }).join('');
+  return `<table><thead>${head}</thead><tbody>${body}</tbody></table>`;
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showCopyFeedback(); } catch(e) { alert('Copy thất bại, hãy thử Xuất CSV thay thế.'); }
+  document.body.removeChild(ta);
+}
+
+function showCopyFeedback() {
+  const btn = document.getElementById('btnCopy');
+  const toast = document.getElementById('copyToast');
+  btn.textContent = '✅ Đã copy!';
+  btn.classList.add('copied');
+  toast.classList.add('show');
+  setTimeout(() => {
+    btn.textContent = '📋 Copy sang Excel';
+    btn.classList.remove('copied');
+    toast.classList.remove('show');
+  }, 2500);
+}
+
+function loadSample() {
+  document.getElementById('inputAddr').value = `Thôn Tháp Nhuận - Xã Đan Điền - Thành Phố Huế
+Số 21b/3e - KP Bình Đáng - Bình Hòa - Tp.HCM
+Ấp 7 - Xã Mỹ Thành - Đồng Tháp
+Đội 1 Thôn Đào Lâm - Nguyễn Lương Bằng - Hải Phòng
+Thôn Thạch Bắc - Tiên Trang - Thanh Hóa
+Tổ 3 Ấp Mỹ Đức - Bình Cơ - Tp.HCM
+Tổ Dân Phố Tri Phong - Phường Tây Hoa Lư - Ninh Bình
+Ấp Thuận Lợi - Xã Tân Thuận - Tỉnh Cà Mau
+Tổ 1 - Ấp Nha Sáp - Xã Vĩnh Điều - Tỉnh An Giang
+Thôn Trung Thành - Xã Cam Hồng - Tỉnh Quảng Ngãi
+Trị Ấp Mỹ Lợi B - Xã Hiệp Hưng - Thành Phố Cần Thơ
+Thôn Cây Đa 1 - Sơn Thủy - Tuyên Quang
+Ấp Sóc Tro Dưới - Xã Lưu Nghiệp Anh - Tỉnh Vĩnh Long
+Ấp Ngãi Nhất - Tam Ngãi - Vĩnh Long
+Ấp Mỹ Lợi B - Xã Mỹ Tú - Thành Phố Cần Thơ
+Tân Hải - Phú Tân - Cà Mau
+Ấp Thuận Lợi - Xã Tân Thuận - Tỉnh Cà Mau
+Ấp 1A - Xã Phước Hòa - Tp.HCM
+Thôn Hội Tín - Xã Tuy An Đông - Tỉnh Đắk Lắk`;
+  parseAll();
+}
+
+function clearAll() {
+  document.getElementById('inputAddr').value = '';
+  results = [];
+  document.getElementById('statsRow').style.display = 'none';
+  document.getElementById('tableBody').innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="icon">📭</div>Dán địa chỉ vào ô trên và nhấn Phân tích</div></td></tr>';
+}
+</script>
+</body>
+</html>
