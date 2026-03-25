@@ -3557,24 +3557,41 @@ function findProvince(text) {
 }
 
 // ===================== FIND WARD =====================
-// 2. Find ward — scan segments from RIGHT to LEFT, skip province segment
-let wardEntry = null;
-let wardSegIdx = -1;
+function findWard(seg, maTinh) {
+  // strip common prefixes from search input
+  const clean = seg.trim();
+  const cleanN = norm(clean);
+  // also try stripping type prefix from input
+  const stripped = clean.replace(/^(Phường|Xã|Thị trấn|Thị Trấn|Đặc khu|P\.|X\.)\s*/i,'').trim();
+  const strippedN = norm(stripped);
 
-// xác định province segment index (ưu tiên segment cuối)
-let provSegIdx = -1;
-if (maTinh) {
-  for (let i = segs.length - 1; i >= 0; i--) {
-    const c = findProvince(segs[i]);
-    if (c === maTinh) { provSegIdx = i; break; }
+  const pool = maTinh ? (wardByTinh[maTinh] || []) : allWards;
+
+  // Pass 1: exact match on normalized full or simple name
+  for (const w of pool) {
+    const wfN = norm(w.full);
+    const wsN = norm(w.simple);
+    if (cleanN === wfN || cleanN === wsN) return w;
+    if (strippedN === wsN || strippedN === wfN) return w;
   }
-}
 
-// QUÉT TỪ PHẢI SANG TRÁI: gần tỉnh nhất trước
-for (let i = segs.length - 1; i >= 0; i--) {
-  if (i === provSegIdx) continue;
-  const w = findWard(segs[i], maTinh);
-  if (w) { wardEntry = w; wardSegIdx = i; break; }
+  // Pass 2: input contains ward full name or simple name (minimum 4 chars)
+  for (const w of pool) {
+    const wfN = norm(w.full);
+    const wsN = norm(w.simple);
+    if (wfN.length >= 4 && cleanN.includes(wfN)) return w;
+    if (wsN.length >= 4 && cleanN.includes(wsN)) return w;
+    if (wsN.length >= 4 && strippedN.includes(wsN)) return w;
+  }
+
+  // Pass 3: ward simple name contains stripped input (bidirectional, min 4 chars)
+  for (const w of pool) {
+    const wsN = norm(w.simple);
+    if (strippedN.length >= 4 && wsN === strippedN) return w;
+    if (strippedN.length >= 4 && wsN.includes(strippedN)) return w;
+  }
+
+  return null;
 }
 
 // ===================== PARSE ONE ADDRESS =====================
